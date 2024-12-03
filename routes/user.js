@@ -55,5 +55,3 @@ module.exports = router;
 
 
 
-// read about JWTs authentication method  (https://auth0.com/docs/secure/tokens/json-web-tokens)
-// do login and register
