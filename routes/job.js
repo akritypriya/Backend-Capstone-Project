@@ -5,8 +5,46 @@ const dotenv = require("dotenv");
 const authMiddleware = require("../middleware/auth");
 dotenv.config();
 
+// /?limit=10&offset=1       offset,page,skip     limit,size,pageSize,count
+
+
 router.get("/", async (req, res) => {
-    const jobs = await Job.find();
+    const{limit,offset,salary,name,position,type}=req.query;
+    
+    //get me jobs with salary btw 2000 and 10000
+    // const jobs=await Job.find({salary:{$gte:2000,$lte:10000}}).skip(offset).limit(limit);
+    
+    //get me jos with salary=salary
+   // const jobs = await Job.find({salary}).skip(offset).limit(limit);
+    
+    // get me jobs which includes company name with name and salary = salary
+    // const jobs = await Job.find({ companyName: name, salary }).skip(offset).limit(limit);  // will exactly match the name
+    
+    // jobs company name should contain name   // Book book BOOK bOOK
+    //$regex - for string searching $option-case sensitive
+    // const jobs = await Job.find({ companyName: { $regex: name, $options: "i" }, salary }).skip(offset).limit(limit);
+    
+    //search by company name and job position and  salary and job type
+    //  const jobs = await Job.find({ companyName: { $regex: name, $options: "i" }, salary,jobPosition: { $regex: position, $options: "i" },
+    //     jobType: { $regex: type, $options: "i" } }).skip(offset).limit(limit);
+    
+    //search job position and  salary  and job type
+        // const jobs = await Job.find({ salary:{$gte :10000 ,$lte:50000},jobPosition: { $regex: position, $options: "i" } }).
+        // skip(offset).limit(limit);
+
+    // search by company name or job position or  salary or job type    
+    const jobs = await Job.find({
+        $or: 
+            [ name?{companyName: { $regex: name, $options: "i" } }:null,
+             position?{jobPosition: { $regex: position, $options: "i" } }:null ,
+             salary?{salary: { $gte: 2000, $lte: 20000 } }:null ,
+             type? {jobType: { $regex: type, $options: "i" } }:null ].filter(Boolean)
+        
+    })
+    .skip(offset)
+    .limit(limit);
+   
+    // const jobs = await Job.find().skip(offset).limit(limit);
     res.status(200).json(jobs);
 })
 
@@ -103,3 +141,8 @@ module.exports = router;
 // Pagination
 // Searching 
 // Filtering 
+
+// Homework 
+// make as sophisticated and complex filtering and searching as you can
+// for ex: make it so that it can search by company name and job position and  salary and job type
+// for ex: make it so that it can search by company name or job position or  salary or job type

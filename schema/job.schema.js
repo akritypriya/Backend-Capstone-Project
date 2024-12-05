@@ -6,7 +6,7 @@ const jobSchema = new mongoose.Schema({
     },
     logoUrl: {
         type: String,
-        required: true,
+        
     },
     jobPosition: {
         type: String,
@@ -23,28 +23,27 @@ const jobSchema = new mongoose.Schema({
     },
     remoteOffice: {
         type: String,
-        required: true,
         enum: ["work from home", "5-day-office", "hybrid"],  //enum to select one of five
     },
     location: {
         type: String,
-        required: true,
+       
     },
     jobDescription: {
         type: String,
-        required: true,
+        
     },
     companyDescription: {
         type: String,
-        required: true,
+        
     },
     skills: {
         type: String,
-        required: true,
+        
     },
     information: {
         type: String,
-        required: true,
+        
         
     },
     user: {
