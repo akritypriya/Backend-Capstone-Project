@@ -5,8 +5,11 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const bodyParser=require("body-parser");
 const userRoute=require("./routes/user");
-const jobRoute=require("./routes/job")
+const jobRoute=require("./routes/job");
+const cors=require("cors");//make request to backend and default use all the methods and services
+
 dotenv.config();
+app.use(cors());
 const PORT = process.env.PORT || 3000;
 app.use(express.static(path.join(__dirname, "public")));
 app.get("/", (req, res) => {

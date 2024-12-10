@@ -9,8 +9,16 @@ dotenv.config();
 
 
 router.get("/", async (req, res) => {
-    const{limit,offset,salary,name,position,type}=req.query;
-    
+    const{limit,offset,salary,name}=req.query;
+    //conditional query
+    const query={};
+    if(salary){
+        query.salary={$gte:salary,$lte:salary};
+    }
+    if(name){
+        query.companyName={$regex:name|| "",$options:"i"};
+    }
+    const jobs = await Job.find().skip(offset||0).limit(limit||10);
     //get me jobs with salary btw 2000 and 10000
     // const jobs=await Job.find({salary:{$gte:2000,$lte:10000}}).skip(offset).limit(limit);
     
@@ -33,17 +41,21 @@ router.get("/", async (req, res) => {
         // skip(offset).limit(limit);
 
     // search by company name or job position or  salary or job type    
-    const jobs = await Job.find({
-        $or: 
-            [ name?{companyName: { $regex: name, $options: "i" } }:null,
-             position?{jobPosition: { $regex: position, $options: "i" } }:null ,
-             salary?{salary: { $gte: 2000, $lte: 20000 } }:null ,
-             type? {jobType: { $regex: type, $options: "i" } }:null ].filter(Boolean)
+    // const jobs = await Job.find({
+    //     $or: 
+    //         [ name?{companyName: { $regex: name, $options: "i" } }:null,
+    //          position?{jobPosition: { $regex: position, $options: "i" } }:null ,
+    //          salary?{salary: { $gte: 2000, $lte: 20000 } }:null ,
+    //          type? {jobType: { $regex: type, $options: "i" } }:null ].filter(Boolean)
         
-    })
-    .skip(offset)
-    .limit(limit);
-   
+    // })
+    // .skip(offset)
+    // .limit(limit);
+    //get me jobs which includes company name with name and salary = salary
+    // const jobs = await Job.find({ companyName: {$regex:name|| "",$options:"i"}},
+    //      {salary:salary || "" }).skip(offset).limit(limit||10);  //if nothing provide by frontend side e provide default value
+  
+    
     // const jobs = await Job.find().skip(offset).limit(limit);
     res.status(200).json(jobs);
 })
