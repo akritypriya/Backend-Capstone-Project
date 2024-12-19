@@ -38,7 +38,8 @@ const jobSchema = new mongoose.Schema({
         
     },
     skills: {
-        type: String,
+        type: Array,
+        required: true,
         
     },
     information: {

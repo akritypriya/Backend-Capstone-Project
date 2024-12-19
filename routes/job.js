@@ -9,7 +9,7 @@ dotenv.config();
 
 
 router.get("/", async (req, res) => {
-    const{limit,offset,salary,name}=req.query;
+    const{limit,offset,salary,name,skills}=req.query;
     //conditional query
     const query={};
     if(salary){
@@ -18,7 +18,15 @@ router.get("/", async (req, res) => {
     if(name){
         query.companyName={$regex:name|| "",$options:"i"};
     }
-    const jobs = await Job.find().skip(offset||0).limit(limit||10);
+    if(skills){
+        //all skills must be in the skills array
+        //query.skills={$all:skills.split(",")}; // works like and operator
+        //at least one skill must be in skills array
+        query.skills={$in:skills.split(",")};// works like or operator
+
+    }
+    const jobs = await Job.find(query).skip(offset||0).limit(limit||50);
+    const count=await Job.countDocuments(query);//total no of docs
     //get me jobs with salary btw 2000 and 10000
     // const jobs=await Job.find({salary:{$gte:2000,$lte:10000}}).skip(offset).limit(limit);
     
@@ -57,7 +65,7 @@ router.get("/", async (req, res) => {
   
     
     // const jobs = await Job.find().skip(offset).limit(limit);
-    res.status(200).json(jobs);
+    res.status(200).json({jobs,count});
 })
 
 router.get("/:id", async (req, res) => {
@@ -83,7 +91,7 @@ router.delete("/:id", authMiddleware, async (req, res) => {
     await Job.deleteOne({ _id: id });
     res.status(200).json({ message: "Job deleted" });
 })
-
+//css,js,node,react
 router.post("/", authMiddleware, async (req, res) => {
     const { companyName,logoUrl, jobPosition, salary, jobType,remoteOffice,
         location,jobDescription,companyDescription,skills,information} = req.body;
@@ -91,6 +99,7 @@ router.post("/", authMiddleware, async (req, res) => {
         !location|| !jobDescription|| !companyDescription|| !skills||!information) {
         return res.status(400).json({ message: "Missing required fields" });
     }
+    const skillsArray=skills.split(",").map((skill)=>skill.trim());
     try {
         const user = req.user;
         const job = await Job.create({
@@ -103,7 +112,7 @@ router.post("/", authMiddleware, async (req, res) => {
             location,
             jobDescription,
             companyDescription,
-            skills,
+            skills:skillsArray,
             information,
             user: user.id,
         });
